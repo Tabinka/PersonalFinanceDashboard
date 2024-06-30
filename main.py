@@ -1,9 +1,11 @@
 import pandas as pd
-from dash import Dash, html
+from dash import Dash
 from basic_layout import basic_layout
 from starting_layout import starting_layout
 
-app = Dash()
+external_stylesheets = ['https://codepen.io/chriddyp/pen/bWLwgP.css']
+
+app = Dash(external_stylesheets=external_stylesheets)
 start = starting_layout(app) ## start with upload button
 
 ## when file uploaded, it will show graphs (try, except here is not nessesery)

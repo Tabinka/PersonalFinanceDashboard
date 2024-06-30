@@ -1,4 +1,4 @@
-from dash import Dash, html
+from dash import html
 
 class basic_layout:
       def __init__(self, data, app):
