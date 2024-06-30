@@ -11,7 +11,7 @@ class BasicLayout:
             if 'Amount' in self.data.columns:
                   self.data['Amount'] = self.data['Amount'].astype(float)  # Convert to float, adjust as needed
             return html.Div([
-                  html.H5("Render file"),
+                  html.H5("Render saved file"),
 
                   dash_table.DataTable(
                         self.data.to_dict('records'),
