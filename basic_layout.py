@@ -10,21 +10,8 @@ class BasicLayout:
             self.app.layout = self.start_page()
 
       def start_page(self):
-            df = self.data
-            df['Date'] = pd.to_datetime(df['Date'])
-            df['Month'] = df['Date'].dt.to_period('M').astype(str)
-            
-            income = df[df['Amount'] > 0].groupby('Month')['Amount'].sum()
-            expenses = df[df['Amount'] < 0].groupby('Month')['Amount'].sum()
-            income_expense = pd.DataFrame({'Income': income, 'Expenses': expenses}).reset_index()
-            
-            income_expense_chart = px.bar(
-                  income_expense,
-                  x='Month',
-                  y=['Income', 'Expenses'],
-                  barmode='group',
-                  title='Total Income vs. Total Expenses'
-                  )
+            income_expense_chart, df_income_expense = self.income_expense(self.data)
+            savings_chart = self.savings(df_income_expense)
             
             return html.Div([
                   html.H5("Render saved file"),
@@ -33,4 +20,29 @@ class BasicLayout:
                   [{'name': i, 'id': i} for i in self.data.columns]
                   ),
                   html.Hr(),
-                  dcc.Graph(id='income-expense-chart', figure=income_expense_chart)])
+                  dcc.Graph(id='income-expense-chart', figure=income_expense_chart),
+                  dcc.Graph(id='monthly-savings-chart', figure=savings_chart)])
+            
+      def income_expense(self, df):
+            df['Date'] = pd.to_datetime(df['Date'])
+            df['Month'] = df['Date'].dt.to_period('M').astype(str)
+            
+            income_expense = df.groupby('Month').agg({'Amount': 'sum'}).reset_index()
+            income_expense['Income'] = df[df['Amount'] > 0].groupby('Month')['Amount'].sum().values
+            income_expense['Expenses'] = df[df['Amount'] < 0].groupby('Month')['Amount'].sum().values
+            
+            return px.bar(
+                  income_expense,
+                  x='Month',
+                  y=['Income', 'Expenses'],
+                  barmode='group',
+                  title='Total Income vs. Total Expenses'
+                  ), income_expense
+            
+      def savings(self, df):
+            return px.line(
+            df,
+            x='Month',
+            y='Amount',
+            title='Monthly Savings'
+                  )
