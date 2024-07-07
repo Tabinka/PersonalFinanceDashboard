@@ -18,8 +18,11 @@ if __name__ == '__main__':
     categorizer.evaluate_model(X_test, y_test)
     categorizer.save_model('transaction_model.pkl', 'transaction_vectorizer.pkl')
     categorizer.load_model('transaction_model.pkl', 'transaction_vectorizer.pkl')
-    categorizer.unlabeled_data['Predicted_Category'] = categorizer.unlabeled_data['Concatenated_Details'].apply(categorizer.categorize)
-    final_df = pd.concat([categorizer.labeled_data, categorizer.unlabeled_data])
+    
+    non_empty_unlabeled = categorizer.unlabeled_data[categorizer.unlabeled_data['Concatenated_Details'].str.strip() != '']
+    non_empty_unlabeled['Predicted_Category'] = non_empty_unlabeled['Concatenated_Details'].apply(categorizer.categorize)
+    
+    final_df = pd.concat([categorizer.labeled_data, categorizer.unlabeled_data, non_empty_unlabeled])
     
     # Save the final categorized transactions to a new CSV file
     final_df.to_csv('final_categorized_transactions.csv', index=False)
